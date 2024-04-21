@@ -14,6 +14,19 @@ def customer_deal(request):
     elif request.method in ['POST', 'PUT', 'DELETE']:
         request.params = json.loads(request.body)
 
+    # 根据session判断用户是否是登录的管理员用户：
+    if 'usertype' not in request.session:
+        return JsonResponse({
+            'ret': 302,
+            'msg': '未登录',
+            'redirect': '/mgr/sign.html'},status=302)
+
+    if request.session['usertype'] != 'mgr':
+        return JsonResponse({
+            'ret': 302,
+            'msg': '用户非mgr类型',
+            'redirect': '/mgr/sign.html'},status=302)
+
     # 根据不同的action分配不同的函数进行处理
     action = request.params['action']
     if action == 'list_customer':
